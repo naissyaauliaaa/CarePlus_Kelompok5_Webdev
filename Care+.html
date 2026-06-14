@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Care+</title>
+<link rel="stylesheet" href="Care+.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght=0,400;0,600;1,400;1,500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<header>
+  <div class="navwrap">
+    <div class="logo" style="color: #2B6CB0;">
+        <img src="logo.png" alt="Logo Care+" class="logo-img">Care+</div>
+    <nav>
+      <button class="nav-link active" data-page="beranda">Beranda</button>
+      <button class="nav-link" data-page="dokter">Chat Dokter</button>
+      <button class="nav-link" data-page="reservasi">Reservasi Baru</button>
+      <button class="nav-link" data-page="riwayat-medis">Profil & Riwayat</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="page active" id="page-beranda">
+    <div class="hero">
+      <div>
+        <h1>Konsultasi dokter,<br>kapan saja kamu butuh.</h1>
+        <p>Cari dokter spesialis, booking jadwal konsultasi, dan catat keluhan awal kamu sebelum bertemu dokter, semua dalam satu tempat yang tenang.</p>
+        <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="goPage('dokter')">Konsultasi Dokter</button>
+          <button class="btn btn-outline" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.5);" onclick="goPage('riwayat-medis')">Kelola Profil Pasien</button>
+        </div>
+      </div>
+      <div class="hero-stats">
+        <div><strong id="stat-doctors">0</strong><span style="color: #fff;">Dokter</span></div>
+        <div><strong id="stat-bookings">0</strong><span style="color: #fff;">Reservasi</span></div>
+        <div><strong id="stat-profiles">1</strong><span style="color: #fff;">Profil Keluarga</span></div>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <h2>Dokter Tersedia Hari Ini</h2>
+      <span class="muted">Lihat semua di tab Chat Dokter</span>
+    </div>
+    <div class="grid" id="home-doctors"></div>
+  </section>
+
+  <section class="page" id="page-dokter">
+    <div class="section-title">
+      <h2>Konsultasi & Chat Dokter Spesialis</h2>
+    </div>
+    <div class="form-row" style="max-width:320px;margin-bottom:24px;">
+      <label for="doctor-search">Cari / Filter Spesialisasi</label>
+      <input type="text" id="doctor-search" placeholder="contoh: Anak, Jantung, Kulit...">
+    </div>
+    <div class="grid" id="doctor-list"></div>
+  </section>
+
+  <section class="page" id="page-room-chat">
+    <div class="section-title">
+      <button class="btn btn-outline btn-sm" id="btn-outline-kembali" onclick="goPage('dokter')">Kembali ke Daftar Dokter</button>
+      <span class="muted">Sesi Konsultasi Terenkripsi Medis</span>
+    </div>
+    <div class="chat-box">
+      <div class="chat-header">
+        <div class="doc-avatar" id="chat-doc-avatar">DS</div>
+        <div>
+          <div id="chat-doc-name" style="font-weight:700; font-size:1.05rem;">Nama Dokter</div>
+          <div id="chat-doc-spec" style="font-size:0.78rem; opacity:0.85;">Spesialis</div>
+        </div>
+      </div>
+      <div class="chat-body" id="chat-messages-container"></div>
+      <div class="chat-footer">
+        <input type="text" id="chat-input-message" placeholder="Tulis keluhan atau pesan ke dokter di sini...">
+        <button class="btn btn-primary" id="btn-send-message" onclick="sendMessage()">Kirim</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-reservasi">
+    <div class="section-title">
+      <h2>Reservasi Konsultasi & Rekam Medis Awal</h2>
+    </div>
+
+    <div class="form-card" style="margin: 0 auto 32px;">
+      <form id="booking-form" novalidate>
+        
+        <h3 style="color:var(--primary); border-bottom:2px solid var(--line); padding-bottom:6px; margin-bottom:16px;">1. Pilih Profil Pasien & Fasilitas</h3>
+        
+        <div class="form-row" id="fr-choose-profile">
+          <label for="b-profile-id">Pilih Profil Anggota Keluarga Pasien</label>
+          <select id="b-profile-id">
+            </select>
+          <div class="error-msg">Silakan tentukan profil pasien atau tambahkan profil baru di menu utama.</div>
+          <p style="margin:4px 0 0; font-size:0.8rem; color:var(--muted);">
+            Tidak menemukan nama anggota keluarga? <a href="#" onclick="goPage('riwayat-medis'); openProfileModal(); return false;" id="btn-tambah-profil" style="font-weight:600; text-decoration:underline;">Tambah Profil Baru</a>
+          </p>
+        </div>
+
+        <div class="form-row" id="fr-doctor">
+          <label for="b-doctor">Pilih Dokter Spesialis</label>
+          <select id="b-doctor">
+            <option value="">Pilih Dokter</option>
+          </select>
+          <div class="error-msg">Silakan pilih dokter.</div>
+        </div>
+
+        <div class="form-row" id="fr-hospital">
+          <label for="b-hospital">Pilih Rumah Sakit Tujuan / Mitra</label>
+          <select id="b-hospital">
+            <option value="">Pilih Rumah Sakit / Klinik</option>
+            <option value="Siloam Hospitals">Siloam Hospitals</option>
+            <option value="Rumah Sakit Hasan Sadikin (RSHS)">Rumah Sakit Hasan Sadikin (RSHS)</option>
+            <option value="Mitra Keluarga">Mitra Keluarga</option>
+            <option value="Hermina Hospital">Hermina Hospital</option>
+            <option value="Klinik Utama Sehat.in">Klinik Utama Care+ (Layanan Virtual)</option>
+          </select>
+          <div class="error-msg">Silakan tentukan pilihan Rumah Sakit atau Klinik mitra.</div>
+        </div>
+
+        <div class="two-col">
+          <div class="form-row" id="fr-date">
+            <label for="b-date">Tanggal Konsultasi</label>
+            <input type="date" id="b-date">
+            <div class="error-msg">Pilih tanggal hari ini atau setelahnya.</div>
+          </div>
+          <div class="form-row" id="fr-time">
+            <label for="b-time">Jam Konsultasi</label>
+            <select id="b-time">
+              <option value="">Pilih Jam</option>
+              <option>08:00 - 09:00</option>
+              <option>09:00 - 10:00</option>
+              <option>10:00 - 11:00</option>
+              <option>11:00 - 12:00</option>
+              <option>13:00 - 14:00</option>
+              <option>14:00 - 15:00</option>
+              <option>15:00 - 16:00</option>
+              <option>16:00 - 17:00</option>
+            </select>
+            <div class="error-msg">Pilih jam konsultasi.</div>
+          </div>
+        </div>
+
+        <h3 style="color:var(--primary); border-bottom:2px solid var(--line); padding-bottom:6px; margin-top:32px; margin-bottom:16px;">2. Detail Medis & Keluhan Saat Ini</h3>
+
+        <div class="form-row" id="fr-temp">
+          <label for="b-temp">Suhu Tubuh Pasien (°C)</label>
+          <input type="number" step="0.1" id="b-temp" placeholder="contoh: 36.5">
+          <div class="error-msg">Suhu harus antara 30–45°C.</div>
+        </div>
+
+        <div class="form-row" id="fr-symptom">
+          <label for="b-symptom">Keluhan / Gejala Utama</label>
+          <textarea id="b-symptom" placeholder="Jelaskan gejala yang dirasakan secara detail (minimal 10 karakter)..."></textarea>
+          <div class="error-msg">Keluhan wajib diisi (min. 10 karakter).</div>
+        </div>
+
+        <div class="form-row">
+          <label for="b-history">Riwayat Penyakit / Alergi Obat <span class="muted">(opsional)</span></label>
+          <textarea id="b-history" placeholder="contoh: Alergi obat penisilin, riwayat asma..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="btn-primary-kirim" style="padding:14px; font-size:1rem;">Kirim Pengajuan Reservasi Medis</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="page" id="page-riwayat-medis">
+    <div class="section-title">
+      <h2>Pusat Manajemen Akun & Profil Keluarga</h2>
+      <button class="btn btn-primary-profil btn-sm" onclick="openProfileModal()">+ Tambah Profil Anggota Baru</button>
+    </div>
+
+    <div class="grid" id="profile-family-grid" style="grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); margin-bottom: 40px;">
+      </div>
+
+    <div class="section-title">
+      <h2>Timeline Rekam Medis & Riwayat Kunjungan</h2>
+    </div>
+    <div id="integrated-history-list" class="grid" style="grid-template-columns:1fr;"></div>
+  </section>
+</main>
+
+<div class="overlay" id="profile-modal">
+  <div class="modal">
+    <h3 id="profile-modal-title">Kelola Profil Medis Pasien</h3>
+    <form id="profile-form" novalidate>
+      <input type="hidden" id="p-id">
+      
+      <h4 style="color: var(--primary); margin-bottom: 10px;">1. Informasi Kontak Inti</h4>
+      <div class="form-row" id="fpr-name">
+        <label for="p-name">Nama Lengkap</label>
+        <input type="text" id="p-name" placeholder="Nama lengkap sesuai identitas">
+        <div class="error-msg">Nama lengkap wajib diisi (min. 3 karakter).</div>
+      </div>
+      
+      <div class="two-col">
+        <div class="form-row" id="fpr-birth">
+          <label for="p-birth">Tanggal Lahir</label>
+          <input type="date" id="p-birth">
+          <div class="error-msg">Tanggal lahir wajib diisi.</div>
+        </div>
+        <div class="form-row" id="fpr-gender">
+          <label for="p-gender">Jenis Kelamin</label>
+          <select id="p-gender">
+            <option value="">Pilih</option>
+            <option value="Laki-laki">Laki-laki</option>
+            <option value="Perempuan">Perempuan</option>
+          </select>
+          <div class="error-msg">Pilih jenis kelamin.</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="form-row" id="fpr-phone">
+          <label for="p-phone">Nomor HP / WhatsApp</label>
+          <input type="tel" id="p-phone" placeholder="08xxxxxxxxxx">
+          <div class="error-msg">Isi nomor HP valid (10-14 angka).</div>
+        </div>
+        <div class="form-row" id="fpr-email">
+          <label for="p-email">Alamat Email</label>
+          <input type="email" id="p-email" placeholder="nama@email.com">
+          <div class="error-msg">Isi alamat email yang valid.</div>
+        </div>
+      </div>
+
+      <h4 style="color: var(--primary); margin-top: 20px; margin-bottom: 10px;">2. Informasi Validasi Identitas (Legal)</h4>
+      <div class="form-row" id="fpr-nik">
+        <label for="p-nik">Nomor Induk Kependudukan (NIK)</label>
+        <input type="text" id="p-nik" placeholder="16 digit angka KTP/KIA">
+        <div class="error-msg">NIK harus berisi 16 digit angka.</div>
+      </div>
+      
+      <div class="two-col">
+        <div class="form-row" id="fpr-kk">
+          <label for="p-kk">Nomor Kartu Keluarga (KK)</label>
+          <input type="text" id="p-kk" placeholder="16 digit No. Kartu Keluarga">
+          <div class="error-msg">Nomor KK harus 16 digit angka.</div>
+        </div>
+        <div class="form-row" id="fpr-passport">
+          <label for="p-passport">Nomor Paspor <span class="muted">(Opsional WNA)</span></label>
+          <input type="text" id="p-passport" placeholder="contoh: X1234567">
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline-cancel" onclick="closeProfileModal()">Batal</button>
+        <button type="submit" class="btn btn-primary" id="profile-save-btn">Simpan Profil Pasien</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="overlay" id="confirm-modal">
+  <div class="modal">
+    <h3>Konfirmasi Hapus</h3>
+    <p class="muted" id="confirm-text">Apakah kamu yakin ingin menghapus data ini?</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeConfirmModal()">Batal</button>
+      <button class="btn btn-danger" id="confirm-delete-btn">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-col brand-col">
+      <div class="logo">
+        <span><div class="logo" style="color: #2B6CB0;">
+        <img src="logo.png" alt="Logo Care+" class="logo-img">Care+</div></span>
+      </div>
+      <p class="footer-desc">
+        Layanan telemedicine modern dan terpercaya untuk memantau kesehatan Anda dan keluarga secara praktis, aman, dan instan langsung dari rumah.
+      </p>
+    </div>
+
+    <div class="footer-col">
+      <h3>Layanan Utama</h3>
+      <ul class="footer-links">
+        <li><a href="#" onclick="event.preventDefault(); document.querySelector('nav button:nth-child(2)').click();">Konsultasi Dokter</a></li>
+        <li><a href="#" onclick="event.preventDefault(); document.querySelector('nav button:nth-child(3)').click();">Reservasi Janji</a></li>
+        <li><a href="#" onclick="event.preventDefault(); document.querySelector('nav button:nth-child(4)').click();">Profil Keluarga</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col contact-col">
+      <h3>Kontak & Darurat</h3>
+      <p class="contact-item">Jl. Bisnis Digital, Jatinangor</p>
+      <p class="contact-item">(062) 1234-5678</p>
+      <p class="contact-item">support@care.plus</p>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-bottom-wrap">
+      <p>&copy; <span id="footer-year"></span> Care+. Hak Cipta Dilindungi.</p>
+      <button id="back-to-top" class="btn-to-top" aria-label="Kembali ke atas">↑</button>
+    </div>
+  </div>
+</footer>
+
+<div id="toast"></div>
+<script src="Care+.js"></script>
+</body>
+</html>
