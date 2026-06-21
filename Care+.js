@@ -79,27 +79,23 @@ function getAge(birthDateString) {
    ========================================================= */
 function doctorCardHTML(d) {
   const isAvail = d.avail === 'yes';
-  const initials = d.name.replace('dr.','').trim().split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-  const avatarHTML = d.img
-    ? `<img src="${d.img}" alt="${esc(d.name)}" class="doc-avatar" style="object-fit:cover;">`
-    : `<div class="doc-avatar">${initials}</div>`;
-
+  // Jika d.img ada, gunakan path-nya, jika tidak, gunakan div kosong
+  const imgElement = d.img 
+    ? `<img src="${d.img}" alt="${esc(d.name)}" class="doc-avatar" style="width:60px; height:60px; object-fit:cover; border-radius:50%;">`
+    : `<div class="doc-avatar" style="width:60px; height:60px; background:#ccc; border-radius:50%;"></div>`;
+  
   return `
     <div class="card doc-card">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        ${avatarHTML}
+        ${imgElement}
         <span class="status-badge ${isAvail ? 'available' : 'unavailable'}">
           ${isAvail ? '● Tersedia' : '● Tutup'}
         </span>
       </div>
       <div class="doc-name">${esc(d.name)}</div>
       <span class="badge">${esc(d.spec)}</span>
-      <div class="doc-meta" style="margin-top:auto;">${d.exp} tahun pengalaman</div>
-      <button 
-        class="btn btn-primary-chat btn-sm btn-block ${!isAvail ? 'btn-disabled' : ''}" 
-        style="margin-top: 8px;" 
-        onclick="${isAvail ? `openChatRoom(${d.id})` : 'return false;'}"
-        ${!isAvail ? 'disabled' : ''}>
+      <div class="doc-meta">${d.exp} tahun pengalaman</div>
+      <button class="btn btn-primary-chat" onclick="openChatRoom(${d.id})" ${!isAvail ? 'disabled' : ''}>
         ${isAvail ? 'Chat Sekarang' : 'Tidak Tersedia'}
       </button>
     </div>`;

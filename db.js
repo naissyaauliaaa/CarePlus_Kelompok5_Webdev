@@ -52,15 +52,19 @@ if (doctorCount === 0) {
     'INSERT INTO doctors (name, spec, exp, avail, img) VALUES (?,?,?,?,?)'
   );
   const seedDoctors = [
-    { name: "dr. Anisa Putri, Sp.A", spec: "Spesialis Anak", exp: 8, avail: "yes" },
-    { name: "dr. Bagas Santoso, Sp.PD", spec: "Spesialis Penyakit Dalam", exp: 12, avail: "yes" },
-    { name: "dr. Citra Lestari, Sp.KK", spec: "Spesialis Kulit & Kelamin", exp: 5, avail: "no" },
-    { name: "dr. Dimas Pratama, Sp.JP", spec: "Spesialis Jantung", exp: 15, avail: "yes" },
-  ];
-  const insertMany = db.transaction((rows) => {
-    for (const d of rows) insertDoctor.run(d.name, d.spec, d.exp, d.avail, null);
-  });
-  insertMany(seedDoctors);
+  { name: "dr. Anisa Putri, Sp.A", spec: "Spesialis Anak", exp: 8, avail: "yes", img: "anisa.jpg" },
+  { name: "dr. Bagas Santoso, Sp.PD", spec: "Spesialis Penyakit Dalam", exp: 12, avail: "yes", img: "bagas.jpg" },
+  { name: "dr. Citra Lestari, Sp.KK", spec: "Spesialis Kulit & Kelamin", exp: 5, avail: "no", img: "citra.jpg" },
+  { name: "dr. Dimas Pratama, Sp.JP", spec: "Spesialis Jantung", exp: 15, avail: "yes", img: "dimas.jpg" },
+];
+
+const insertMany = db.transaction((rows) => {
+  for (const d of rows) {
+    // Pastikan urutannya benar (sesuai urutan di tabel)
+    insertDoctor.run(d.name, d.spec, d.exp, d.avail, d.img);
+  }
+});
+insertMany(seedDoctors);
 }
 
 // Seed profil utama default
